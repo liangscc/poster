@@ -5,42 +5,75 @@ const app = getApp()
 Page({
   data: {
     cardInfo: {
-      avater: "http://t2.hddhhn.com/uploads/tu/201806/9999/91480c0c87.jpg", //需要https图片路径
-      qrCode: "http://i4.hexun.com/2018-07-05/193365388.jpg", //需要https图片路径
-      TagText: "小姐姐", //标签
-      Name: '小姐姐', //姓名
+      posterImage: "https://sf3-ttcdn-tos.pstatp.com/img/pgc-image/c7e1c68c02ed4eb9adba10db036abc94~cs_960x624.jpg", //需要https图片路径
+      qrCode: "https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=327226293,686698084&fm=26&gp=0.jpg", //需要https图片路径
+      // posterImage: "images/posterImage.png", //需要https图片路径
+      // qrCode: "images/qrCode.png", //需要https图片路径
+      // TagText: "小姐姐", //标签
+      // Name: '小姐姐', //姓名
       Position: "程序员鼓励师", //职位
       Mobile: "13888888888", //手机
       Company: "才华无限有限公司", //公司
+
+
+      // posterImage: '',
+      qrCode: 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fbpic.588ku.com%2Felement_origin_min_pic%2F01%2F37%2F19%2F58573c403bcf4bf.jpg&refer=http%3A%2F%2Fbpic.588ku.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1614172515&t=6bc3f9c6022e44d310627ba15f80eae7',
+      posterBg: '',
+      posterFooterBg: '',
+      productName: '草本浓缩速溶茶饮（柠檬口味）',
+      productDesc: '由本草植物提炼而成，令你活力满满的美味草本饮品',
+      userName: 'Neil',
+      avatar: '',
     }
   },
 
-  onLoad: function() {
+  onLoad: function () {
     this.getAvaterInfo();
+    // wx.getUserInfo({
+    //   success: res => {
+    //     console.log(res.userInfo,"huoqudao le ")
+    //     this.setData({
+    //       name: res.userInfo.nickName,
+    //     })
+    //     wx.downloadFile({
+    //       url: res.userInfo.avatarUrl, //仅为示例，并非真实的资源
+    //       success: function (res) {
+    //         // 只要服务器有响应数据，就会把响应内容写入文件并进入 success 回调，业务需要自行判断是否下载到了想要的内容
+    //         if (res.statusCode === 200) {
+    //           console.log(res, "reererererer")
+    //           that.setData({
+    //             touxiang: res.tempFilePath
+    //           })
+    //         }
+    //       }
+    //     })
+    //   }
+    // })
   },
 
   /**
    * 先下载头像图片
    */
-  getAvaterInfo: function() {
+  getAvaterInfo: function () {
     wx.showLoading({
       title: '生成中...',
       mask: true,
     });
     var that = this;
     wx.downloadFile({
-      url: that.data.cardInfo.avater, //头像图片路径
-      success: function(res) {
+      url: that.data.cardInfo.posterImage, //头像图片路径
+      success: function (res) {
         wx.hideLoading();
         if (res.statusCode === 200) {
           var avaterSrc = res.tempFilePath; //下载成功返回结果
           that.getQrCode(avaterSrc); //继续下载二维码图片
+          // that.sharePosteCanvas(avaterSrc, '');
         } else {
           wx.showToast({
             title: '头像下载失败！',
             icon: 'none',
             duration: 2000,
-            success: function() {
+            success: function () {
               var avaterSrc = "";
               that.getQrCode(avaterSrc);
             }
@@ -53,7 +86,7 @@ Page({
   /**
    * 下载二维码图片
    */
-  getQrCode: function(avaterSrc) {
+  getQrCode: function (avaterSrc) {
     wx.showLoading({
       title: '生成中...',
       mask: true,
@@ -61,7 +94,7 @@ Page({
     var that = this;
     wx.downloadFile({
       url: that.data.cardInfo.qrCode, //二维码路径
-      success: function(res) {
+      success: function (res) {
         wx.hideLoading();
         if (res.statusCode === 200) {
           var codeSrc = res.tempFilePath;
@@ -71,7 +104,7 @@ Page({
             title: '二维码下载失败！',
             icon: 'none',
             duration: 2000,
-            success: function() {
+            success: function () {
               var codeSrc = "";
               that.sharePosteCanvas(avaterSrc, codeSrc);
             }
@@ -86,7 +119,7 @@ Page({
    * @param avaterSrc 下载的头像图片路径
    * @param codeSrc   下载的二维码图片路径
    */
-  sharePosteCanvas: function(avaterSrc, codeSrc) {
+  sharePosteCanvas: function (avaterSrc, codeSrc) {
     wx.showLoading({
       title: '生成中...',
       mask: true,
@@ -94,81 +127,136 @@ Page({
     var that = this;
     var cardInfo = that.data.cardInfo; //需要绘制的数据集合
     const ctx = wx.createCanvasContext('myCanvas'); //创建画布
-    var width = "";
-    wx.createSelectorQuery().select('#canvas-container').boundingClientRect(function(rect) {
-      var height = rect.height;
-      var right = rect.right;
-      width = rect.width * 0.8;
-      var left = rect.left + 5;
-      ctx.setFillStyle('#fff');
+    wx.createSelectorQuery().select('#canvas-container').boundingClientRect(function (rect) {
+      console.log(rect);
+      var top = rect.top - 12
+      var left = rect.left + 8;
+      var right = rect.right - 20;
+      var width = rect.width - left * 2;
+      var height = rect.height - top * 2;
+      ctx.setFillStyle('rgba(0,0,0,0)');
       ctx.fillRect(0, 0, rect.width, height);
 
-      //头像为正方形
-      if (avaterSrc) {
-        ctx.drawImage(avaterSrc, left, 20, width, width);
-        ctx.setFontSize(14);
-        ctx.setFillStyle('#fff');
-        ctx.setTextAlign('left');
-      }
+      // 画背景
+      ctx.drawImage('/images/canvasBg.png', 0, 0, 351, 508)
 
-      //标签
-      if (cardInfo.TagText) {
-        ctx.fillText(cardInfo.TagText, left + 20, width - 4);
-        const metrics = ctx.measureText(cardInfo.TagText); //测量文本信息
+      // 画Footer
+      if ('/images/posterFooter.png') {
+        var [x, y, w, h, r] = [left, top + height - 62 - 8, width, 62, 20, ]
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, 0);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, 0);
+        ctx.closePath();
+        ctx.strokeStyle = 'rgba(255,255,255,0)'; // 设置绘制圆形边框的颜色
         ctx.stroke();
-        ctx.rect(left + 10, width - 20, metrics.width + 20, 25);
-        ctx.setFillStyle('rgba(255,255,255,0.4)');
-        ctx.fill();
+        ctx.clip();
+        ctx.drawImage('/images/posterFooter.png', x, y, w, h);
+        ctx.restore();
       }
 
-      //姓名
-      if (cardInfo.Name) {
-        ctx.setFontSize(14);
-        ctx.setFillStyle('#000');
-        ctx.setTextAlign('left');
-        ctx.fillText(cardInfo.Name, left, width + 60);
+      // 画海报图片
+      if (avaterSrc) {
+        var [x, y, w, h, r] = [left, top, width, 240, 20, ]
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, 0);
+        ctx.arcTo(x, y + h, x, y, 0);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+        ctx.strokeStyle = 'rgba(255,255,255,0)'; // 设置绘制圆形边框的颜色
+        ctx.stroke();
+        ctx.clip();
+        ctx.drawImage(avaterSrc, x, y, w, h);
+        ctx.restore();
       }
+
+      // 画头像
+      if (codeSrc) {
+        var [x, y, r] = [left + 40, top + 240 + 170 + 12, 20]
+        ctx.save();
+        let d = r * 2;
+        let cx = x + r;
+        let cy = y + r;
+        ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+        ctx.strokeStyle = 'rgba(255,255,255,0)'; // 设置绘制圆形边框的颜色
+        ctx.stroke(); // 绘制出圆形，默认为黑色，可通过 ctx.strokeStyle = '#FFFFFF'， 设置想要的颜色
+        ctx.clip();
+        ctx.drawImage(codeSrc, x, y, d, d);
+        ctx.restore();
+      }
+
       
-      //职位
-      if (cardInfo.Position) {
-        ctx.setFontSize(12);
-        ctx.setFillStyle('#666');
-        ctx.setTextAlign('left');
-        ctx.fillText(cardInfo.Position, left, width + 85);
-      }
 
-      //电话
-      if (cardInfo.Mobile) {
-        ctx.setFontSize(12);
-        ctx.setFillStyle('#666');
-        ctx.setTextAlign('left');
-        ctx.fillText(cardInfo.Mobile, left, width + 105);
-      }
+      // 职位
+      // if (cardInfo.Position) {
+      //   ctx.setFontSize(12);
+      //   ctx.setFillStyle('#666');
+      //   ctx.setTextAlign('left');
+      //   ctx.fillText(cardInfo.Position, left, width + 85);
+      // }
 
-      // 公司名称
-      if (cardInfo.Company) {
-        const CONTENT_ROW_LENGTH = 24; // 正文 单行显示字符长度
-        let [contentLeng, contentArray, contentRows] = that.textByteLength(cardInfo.Company, CONTENT_ROW_LENGTH);
+      // 电话
+      // if (cardInfo.Mobile) {
+      //   ctx.setFontSize(12);
+      //   ctx.setFillStyle('#666');
+      //   ctx.setTextAlign('left');
+      //   ctx.fillText(cardInfo.Mobile, left, width + 105);
+      // }
+
+      // 商品名称
+      if (cardInfo.productName) {
+        const fontSize = 20
+        const CONTENT_ROW_LENGTH = parseInt(width / fontSize) * 2; // 正文 单行显示字符长度
+        let [contentLeng, contentArray, contentRows] = that.textByteLength(cardInfo.productName, CONTENT_ROW_LENGTH);
         ctx.setTextAlign('left');
         ctx.setFillStyle('#000');
-        ctx.setFontSize(10);
+        ctx.setFontSize(fontSize);
         let contentHh = 22 * 1;
         for (let m = 0; m < contentArray.length; m++) {
-          ctx.fillText(contentArray[m], left, width + 150 + contentHh * m);
+          ctx.fillText(contentArray[m], left + 20, 240 + 50 + contentHh * m);
         }
       }
 
-      //  绘制二维码
+      // 商品描述
+      if (cardInfo.productDesc) {
+        const fontSize = 11
+        const CONTENT_ROW_LENGTH = parseInt(width / fontSize) * 2 - 32; // 正文 单行显示字符长度
+        let [contentLeng, contentArray, contentRows] = that.textByteLength(cardInfo.productDesc, CONTENT_ROW_LENGTH);
+        ctx.setTextAlign('left');
+        ctx.setFillStyle('#666');
+        ctx.setFontSize(fontSize);
+        let contentHh = 16 * 1;
+        for (let m = 0; m < contentArray.length; m++) {
+          ctx.fillText(contentArray[m], left + 20, top + 240 + 40 + 55 + contentHh * m);
+        }
+      }
+
+      //  绘制二维码 
       if (codeSrc) {
-        ctx.drawImage(codeSrc, left + 160, width + 40, width / 3, width / 3)
-        ctx.setFontSize(10);
-        ctx.setFillStyle('#000');
-        ctx.fillText("微信扫码或长按识别", left + 160, width + 150);
+        ctx.drawImage(codeSrc, left + 195, top + 240 + 65, 90, 90)
+      }
+
+      // 姓名
+      if (cardInfo.userName) {
+        console.log(cardInfo.userName);
+        ctx.save();
+        ctx.setFontSize(12);
+        ctx.setFillStyle('#fff');
+        ctx.setTextAlign('left');
+        ctx.fillText(`${cardInfo.userName} 向你推荐`, left + 90, top + 238 + 200 );
+        ctx.fillText(`${cardInfo.productName}`, left + 90, top + 254 + 200 );
+        ctx.restore()
       }
 
     }).exec()
 
-    setTimeout(function() {
+    setTimeout(function () {
       ctx.draw();
       wx.hideLoading();
     }, 1000)
@@ -208,16 +296,16 @@ Page({
   },
 
   //点击保存到相册
-  saveShareImg: function() {
+  saveShareImg: function () {
     var that = this;
     wx.showLoading({
       title: '正在保存',
       mask: true,
     })
-    setTimeout(function() {
+    setTimeout(function () {
       wx.canvasToTempFilePath({
         canvasId: 'myCanvas',
-        success: function(res) {
+        success: function (res) {
           wx.hideLoading();
           var tempFilePath = res.tempFilePath;
           wx.saveImageToPhotosAlbum({
@@ -229,13 +317,13 @@ Page({
                 showCancel: false,
                 confirmText: '好的',
                 confirmColor: '#333',
-                success: function(res) {
+                success: function (res) {
                   if (res.confirm) {}
                 },
-                fail: function(res) {}
+                fail: function (res) {}
               })
             },
-            fail: function(res) {
+            fail: function (res) {
               wx.showToast({
                 title: res.errMsg,
                 icon: 'none',
@@ -247,5 +335,6 @@ Page({
       });
     }, 1000);
   },
+
 
 })
